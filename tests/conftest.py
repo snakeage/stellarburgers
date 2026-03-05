@@ -1,9 +1,12 @@
+from uuid import uuid4
+
 import pytest
 import requests
 from faker import Faker
 
 from clients.auth_client import AuthClient
 from config import BASE_URL
+from models.auth_entities import RegisterPayload
 from utils.requester import CustomRequester
 
 
@@ -34,11 +37,11 @@ def auth_client(requester):
 def user_credentials():
     faker = Faker()
 
-    return {
-        "email": faker.email(),
-        "password": faker.password(),
-        "name": faker.name(),
-    }
+    return RegisterPayload(
+        email=f"aqa_{uuid4().hex[:10]}@example.com",
+        password=faker.password(),
+        name=faker.name(),
+    )
 
 
 @pytest.fixture(scope="function")
@@ -50,9 +53,9 @@ def registered_user(auth_client, user_credentials):
     user_data = {
         "access_token": body.get("accessToken"),
         "refresh_token": body.get("refreshToken"),
-        "email": user_credentials.get("email"),
-        "password": user_credentials.get("password"),
-        "name": user_credentials.get("name"),
+        "email": user_credentials.email,
+        "password": user_credentials.password,
+        "name": user_credentials.name,
     }
 
     yield user_data

@@ -1,22 +1,25 @@
 from constants import Auth
+from models.auth_entities import LoginPayload, RegisterPayload, UpdateUserPayload
 
 
 class AuthClient:
     def __init__(self, requester):
         self.requester = requester
 
-    def register(self, payload):
+    def register(self, payload: RegisterPayload):
         return self.requester.send_request(
             method="POST",
             endpoint=Auth.REGISTER,
-            data=payload,
+            data=payload.model_dump(by_alias=True, exclude_none=True),
         )
 
-    def login(self, payload):
+    def login(self, payload: LoginPayload):
         return self.requester.send_request(
             method="POST",
             endpoint=Auth.LOGIN,
-            data=payload,
+            data=payload.model_dump(by_alias=True, exclude_none=True)
+            if hasattr(payload, "model_dump")
+            else payload,
         )
 
     def logout(self, refresh_token, access_token):
@@ -45,11 +48,11 @@ class AuthClient:
             },
         )
 
-    def patch_user(self, access_token, payload):
+    def patch_user(self, access_token, payload: UpdateUserPayload):
         return self.requester.send_request(
             method="PATCH",
             endpoint=Auth.USER,
-            data=payload,
+            data=payload.model_dump(by_alias=True, exclude_none=True),
             headers={
                 "Authorization": access_token,
             },
