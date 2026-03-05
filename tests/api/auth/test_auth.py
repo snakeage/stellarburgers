@@ -11,7 +11,7 @@ class TestAuthApi:
 
         body = assert_user_registered(resp)
 
-        access_token = body.get('accessToken')
+        access_token = body.access_token
 
         resp_got = auth_client.get_user(access_token)
 
@@ -116,7 +116,7 @@ def test_protected_methods_without_token(
 
     data = assert_error_data(resp, expected_status)
 
-    assert expected_message in data.get('message', '')
+    assert expected_message in data.message
 
 
 @pytest.mark.negative
