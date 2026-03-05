@@ -3,6 +3,8 @@ certifi==2026.1.4
 cfgv==3.5.0
 charset-normalizer==3.4.4
 distlib==0.4.0
+dnspython==2.8.0
+email-validator==2.3.0
 Faker==40.4.0
 filelock==3.25.0
 identify==2.6.17

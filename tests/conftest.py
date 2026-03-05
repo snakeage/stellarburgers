@@ -4,6 +4,7 @@ from faker import Faker
 
 from clients.auth_client import AuthClient
 from config import BASE_URL
+from models.auth_entities import RegisterPayload
 from utils.requester import CustomRequester
 
 
@@ -34,11 +35,11 @@ def auth_client(requester):
 def user_credentials():
     faker = Faker()
 
-    return {
-        "email": faker.email(),
-        "password": faker.password(),
-        "name": faker.name(),
-    }
+    return RegisterPayload(
+        email=faker.email(),
+        password=faker.password(),
+        name=faker.name(),
+    )
 
 
 @pytest.fixture(scope="function")
