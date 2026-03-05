@@ -17,7 +17,9 @@ class AuthClient:
         return self.requester.send_request(
             method="POST",
             endpoint=Auth.LOGIN,
-            data=payload.model_dump(by_alias=True, exclude_none=True),
+            data=payload.model_dump(by_alias=True, exclude_none=True)
+            if hasattr(payload, "model_dump")
+            else payload,
         )
 
     def logout(self, refresh_token, access_token):

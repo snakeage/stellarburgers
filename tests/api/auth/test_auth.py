@@ -10,6 +10,7 @@ from assertions.assert_user_contract import (
     assert_user_registered,
     assert_user_updated,
 )
+from models.auth_entities import LoginPayload, UpdateUserPayload
 
 
 class TestAuthApi:
@@ -40,7 +41,10 @@ class TestAuthApi:
         assert_get_user(resp)
 
     def test_login_user(self, auth_client, registered_user):
-        payload = {"email": registered_user["email"], "password": registered_user["password"]}
+        payload = LoginPayload(
+            email=registered_user["email"],
+            password=registered_user["password"],
+        )
 
         resp = auth_client.login(payload)
 
@@ -56,9 +60,9 @@ class TestAuthApi:
 
     def test_update_user(self, auth_client, registered_user):
         access_token = registered_user["access_token"]
-        payload = {
-            "name": f"{registered_user['name']}_patched",
-        }
+        payload = UpdateUserPayload(
+            email="patched_" + registered_user["email"],
+        )
         resp = auth_client.patch_user(access_token, payload)
 
         assert_user_updated(resp, expected_user=payload)
@@ -98,7 +102,7 @@ class TestAuthApi:
     "method_name,access_token,payload,expected_status,expected_message",
     [
         ("get_user", None, None, 401, "You should be authorised"),
-        ("patch_user", None, {"name": "patched"}, 401, "You should be authorised"),
+        ("patch_user", None, UpdateUserPayload(name="patched"), 401, "You should be authorised"),
         ("delete_user", None, None, 401, "You should be authorised"),
     ],
     ids=["get-without-token", "patch-without-token", "delete-without-token"],

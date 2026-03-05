@@ -44,7 +44,7 @@ def assert_user_logged_in(resp, expected_user=None):
 
     body = resp.json()
 
-    assert body, "Отсутсвует тело ответа"
+    assert body, "Отсутствует тело ответа"
     assert isinstance(body, dict), "Тело ответа должно быть dict"
 
     for field in ("success", "user", "accessToken", "refreshToken"):
@@ -57,7 +57,7 @@ def assert_user_logged_in(resp, expected_user=None):
     assert isinstance(user, dict), "user должен быть dict"
 
     for field in ("email", "name"):
-        assert field in user, f"Отсутсвует поле {field} в ответе"
+        assert field in user, f"Отсутствует поле {field} в ответе"
 
     if expected_user:
         assert user["email"] == expected_user["email"]
@@ -69,11 +69,11 @@ def assert_user_logged_out(resp):
 
     body = resp.json()
 
-    assert body, "Отсутсвует тело ответа"
+    assert body, "Отсутствует тело ответа"
     assert isinstance(body, dict), "Тело ответа должно быть dict"
 
     for field in ("success", "message"):
-        assert field in body, f"Отсутсвует поле {field} в ответе"
+        assert field in body, f"Отсутствует поле {field} в ответе"
 
     assert body["success"] is True
 
@@ -83,11 +83,11 @@ def assert_user_updated(resp, expected_user=None):
 
     body = resp.json()
 
-    assert body, "Отсутсвует тело ответа"
+    assert body, "Отсутствует тело ответа"
     assert isinstance(body, dict), "Тело ответа должно быть dict"
 
     for field in ("success", "user"):
-        assert field in body, f"Отсутсвует поле {field} в ответе"
+        assert field in body, f"Отсутствует поле {field} в ответе"
 
     assert body["success"] is True
 
@@ -96,10 +96,12 @@ def assert_user_updated(resp, expected_user=None):
     assert isinstance(user, dict), "user должен быть dict"
 
     for field in ("email", "name"):
-        assert field in user, f"Отсутсвует поле {field} в ответе"
+        assert field in user, f"Отсутствует поле {field} в ответе"
 
     if expected_user:
-        assert user["name"] == expected_user["name"]
+        expected_data = expected_user.model_dump(exclude_none=True)
+        for field, expected_value in expected_data.items():
+            assert user[field] == expected_value
 
 
 def assert_token_refreshed(resp):
@@ -107,11 +109,11 @@ def assert_token_refreshed(resp):
 
     body = resp.json()
 
-    assert body, "Отсутсвует тело ответа"
+    assert body, "Отсутствует тело ответа"
     assert isinstance(body, dict), "Тело ответа должно быть dict"
 
     for field in ("success", "accessToken", "refreshToken"):
-        assert field in body, f"Отсутсвует поле {field} в ответе"
+        assert field in body, f"Отсутствует поле {field} в ответе"
 
     assert body["accessToken"].startswith("Bearer ")
     assert isinstance(body["refreshToken"], str)
