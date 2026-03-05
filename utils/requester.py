@@ -22,17 +22,16 @@ class CustomRequester:
         self.logger.setLevel(logging.INFO)
 
     def send_request(
-            self,
-            method: str,
-            endpoint: str,
-            data=None,
-            params=None,
-            headers=None,
-            timeout=15,
-            need_logging: bool = True,
+        self,
+        method: str,
+        endpoint: str,
+        data=None,
+        params=None,
+        headers=None,
+        timeout=15,
+        need_logging: bool = True,
     ) -> requests.Response:
-
-        url = f'{self.base_url}{endpoint}'
+        url = f"{self.base_url}{endpoint}"
 
         response = self.session.request(
             method=method,
@@ -49,15 +48,13 @@ class CustomRequester:
         return response
 
     def log_request_and_response(self, response: requests.Response):
-
         try:
             request = response.request
 
-            headers = " \\\n".join(
-                [f"-H '{h}: {v}'" for h, v in request.headers.items()]
-            )
+            headers = " \\\n".join([f"-H '{h}: {v}'" for h, v in request.headers.items()])
 
-            full_test_name = f"pytest {os.environ.get('PYTEST_CURRENT_TEST', '').replace(' (call)', '')}"
+            current_test = os.environ.get("PYTEST_CURRENT_TEST", "").replace(" (call)", "")
+            full_test_name = f"pytest {current_test}"
 
             body = ""
             if hasattr(request, "body") and request.body:
@@ -89,10 +86,7 @@ class CustomRequester:
                 pass
 
             self.logger.info(f"\n{'=' * 40} RESPONSE {'=' * 40}")
-            self.logger.info(
-                f"\tSTATUS_CODE: {response.status_code}\n"
-                f"\tDATA:\n{response_data}"
-            )
+            self.logger.info(f"\tSTATUS_CODE: {response.status_code}\n\tDATA:\n{response_data}")
 
             self.logger.info(f"{'=' * 80}\n")
 
