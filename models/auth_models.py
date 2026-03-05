@@ -16,3 +16,15 @@ class RegisterResponse(ApiModel):
 class ErrorResponse(ApiModel):
     success: bool
     message: str
+
+
+class LoginResponse(ApiModel):
+    success: bool
+    access_token: str
+    refresh_token: str
+    user: UserModel
+
+
+class UpdateUserResponse(ApiModel):
+    success: bool
+    user: UserModel

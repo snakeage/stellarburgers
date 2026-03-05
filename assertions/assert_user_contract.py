@@ -1,4 +1,4 @@
-from models.auth_models import ErrorResponse, RegisterResponse
+from models.auth_models import ErrorResponse, LoginResponse, RegisterResponse, UpdateUserResponse
 
 
 def assert_user_registered(resp):
@@ -42,26 +42,15 @@ def assert_user_deleted(resp):
 def assert_user_logged_in(resp, expected_user=None):
     assert resp.status_code == 200, resp.text
 
-    body = resp.json()
+    parsed = LoginResponse.model_validate(resp.json())
 
-    assert body, "Отсутствует тело ответа"
-    assert isinstance(body, dict), "Тело ответа должно быть dict"
+    assert parsed.success is True
 
-    for field in ("success", "user", "accessToken", "refreshToken"):
-        assert field in body, f"Отсутсвует поле {field} в ответе"
+    if expected_user is not None:
+        assert parsed.user.email == expected_user["email"]
+        assert parsed.user.name == expected_user["name"]
 
-    assert body["success"] is True
-
-    user = body["user"]
-
-    assert isinstance(user, dict), "user должен быть dict"
-
-    for field in ("email", "name"):
-        assert field in user, f"Отсутствует поле {field} в ответе"
-
-    if expected_user:
-        assert user["email"] == expected_user["email"]
-        assert user["name"] == expected_user["name"]
+    return parsed
 
 
 def assert_user_logged_out(resp):
@@ -81,27 +70,16 @@ def assert_user_logged_out(resp):
 def assert_user_updated(resp, expected_user=None):
     assert resp.status_code == 200, resp.text
 
-    body = resp.json()
+    parsed = UpdateUserResponse.model_validate(resp.json())
 
-    assert body, "Отсутствует тело ответа"
-    assert isinstance(body, dict), "Тело ответа должно быть dict"
-
-    for field in ("success", "user"):
-        assert field in body, f"Отсутствует поле {field} в ответе"
-
-    assert body["success"] is True
-
-    user = body["user"]
-
-    assert isinstance(user, dict), "user должен быть dict"
-
-    for field in ("email", "name"):
-        assert field in user, f"Отсутствует поле {field} в ответе"
+    assert parsed.success is True
 
     if expected_user:
         expected_data = expected_user.model_dump(exclude_none=True)
         for field, expected_value in expected_data.items():
-            assert user[field] == expected_value
+            assert getattr(parsed.user, field) == expected_value
+
+    return parsed
 
 
 def assert_token_refreshed(resp):
