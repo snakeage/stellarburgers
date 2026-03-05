@@ -34,7 +34,7 @@ class TestAuthApi:
         assert resp_got_after_delete.status_code == 404, "Пользователь не удален"
 
     def test_get_user(self, auth_client, registered_user):
-        access_token = registered_user["access_token"]
+        access_token = registered_user.access_token
 
         resp = auth_client.get_user(access_token)
 
@@ -42,8 +42,8 @@ class TestAuthApi:
 
     def test_login_user(self, auth_client, registered_user):
         payload = LoginPayload(
-            email=registered_user["email"],
-            password=registered_user["password"],
+            email=registered_user.email,
+            password=registered_user.password,
         )
 
         resp = auth_client.login(payload)
@@ -51,31 +51,31 @@ class TestAuthApi:
         assert_user_logged_in(resp, expected_user=registered_user)
 
     def test_logout_user(self, auth_client, registered_user):
-        access_token = registered_user["access_token"]
-        refresh_token = registered_user["refresh_token"]
+        access_token = registered_user.access_token
+        refresh_token = registered_user.refresh_token
 
         resp = auth_client.logout(refresh_token, access_token)
 
         assert_user_logged_out(resp)
 
     def test_update_user(self, auth_client, registered_user):
-        access_token = registered_user["access_token"]
+        access_token = registered_user.access_token
         payload = UpdateUserPayload(
-            email="patched_" + registered_user["email"],
+            email="patched_" + registered_user.email,
         )
         resp = auth_client.patch_user(access_token, payload)
 
         assert_user_updated(resp, expected_user=payload)
 
     def test_delete_user(self, auth_client, registered_user):
-        access_token = registered_user["access_token"]
+        access_token = registered_user.access_token
 
         resp = auth_client.delete_user(access_token)
 
         assert_user_deleted(resp)
 
     def test_refresh_token(self, auth_client, registered_user):
-        refresh_token = registered_user["refresh_token"]
+        refresh_token = registered_user.refresh_token
 
         resp = auth_client.refresh_token(refresh_token)
 

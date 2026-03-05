@@ -47,8 +47,8 @@ def assert_user_logged_in(resp, expected_user=None):
     assert parsed.success is True
 
     if expected_user is not None:
-        assert parsed.user.email == expected_user["email"]
-        assert parsed.user.name == expected_user["name"]
+        assert parsed.user.email == expected_user.email
+        assert parsed.user.name == expected_user.name
 
     return parsed
 
