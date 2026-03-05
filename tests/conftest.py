@@ -6,7 +6,7 @@ from faker import Faker
 
 from clients.auth_client import AuthClient
 from config import BASE_URL
-from models.auth_entities import RegisterPayload
+from models.auth_entities import RegisteredUser, RegisterPayload
 from utils.requester import CustomRequester
 
 
@@ -50,15 +50,15 @@ def registered_user(auth_client, user_credentials):
 
     body = resp.json()
 
-    user_data = {
-        "access_token": body.get("accessToken"),
-        "refresh_token": body.get("refreshToken"),
-        "email": user_credentials.email,
-        "password": user_credentials.password,
-        "name": user_credentials.name,
-    }
+    registered_user = RegisteredUser(
+        access_token=body.get("accessToken"),
+        refresh_token=body.get("refreshToken"),
+        email=user_credentials.email,
+        password=user_credentials.password,
+        name=user_credentials.name,
+    )
 
-    yield user_data
+    yield registered_user
 
-    if user_data.get("access_token"):
-        auth_client.delete_user(user_data.get("access_token"))
+    if registered_user.access_token:
+        auth_client.delete_user(registered_user.access_token)
