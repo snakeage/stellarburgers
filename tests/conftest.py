@@ -7,6 +7,7 @@ from faker import Faker
 from clients.auth_client import AuthClient
 from config import BASE_URL
 from models.auth_entities import RegisteredUser, RegisterPayload
+from services.auth_workflow import AuthWorkflow
 from utils.requester import CustomRequester
 
 
@@ -62,3 +63,8 @@ def registered_user(auth_client, user_credentials):
 
     if registered_user.access_token:
         auth_client.delete_user(registered_user.access_token)
+
+
+@pytest.fixture
+def auth_workflow(auth_client):
+    return AuthWorkflow(auth_client)
