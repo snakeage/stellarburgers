@@ -28,3 +28,8 @@ class LoginResponse(ApiModel):
 class UpdateUserResponse(ApiModel):
     success: bool
     user: UserModel
+
+
+class GetUserResponse(ApiModel):
+    success: bool
+    user: UserModel

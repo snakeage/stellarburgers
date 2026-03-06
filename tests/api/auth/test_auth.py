@@ -142,3 +142,15 @@ def test_protected_methods_without_token(
 def test_refresh_token_invalid_values(auth_client, refresh_token, expected_status):
     resp = auth_client.refresh_token(refresh_token)
     assert_error_data(resp, expected_status)
+
+
+def test_register_update_get_workflow(auth_workflow, user_credentials):
+    updated_user_payload = UpdateUserPayload(name="patched_" + user_credentials.name)
+    registered_user, updated = auth_workflow.register_update_get(
+        user_credentials, updated_user_payload
+    )
+
+    assert updated.success is True
+    assert updated.user.name == updated_user_payload.name
+    assert updated.user.email == registered_user.email
+    assert updated.user.name != registered_user.name
