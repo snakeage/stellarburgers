@@ -1,4 +1,10 @@
-from models.auth_models import ErrorResponse, LoginResponse, RegisterResponse, UpdateUserResponse
+from models.auth_models import (
+    ErrorResponse,
+    GetUserResponse,
+    LoginResponse,
+    RegisterResponse,
+    UpdateUserResponse,
+)
 
 
 def assert_user_registered(resp):
@@ -13,18 +19,9 @@ def assert_user_registered(resp):
 def assert_get_user(resp_got):
     assert resp_got.status_code == 200, resp_got.text
 
-    body = resp_got.json()
-
-    assert "user" in body, "Отсутствует поле user в ответе"
-
-    user = body["user"]
-
-    assert isinstance(user, dict), "user должен быть dict"
-
-    for field in ("email", "name"):
-        assert field in user, f"Отсутствует поле {field} в ответе"
-
-    return body
+    parsed = GetUserResponse.model_validate(resp_got.json())
+    assert parsed.success is True
+    return parsed
 
 
 def assert_user_deleted(resp):
