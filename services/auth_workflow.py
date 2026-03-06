@@ -1,12 +1,14 @@
 from assertions.assert_user_contract import (
+    assert_error_data,
     assert_get_user,
     assert_user_logged_in,
+    assert_user_logged_out,
     assert_user_registered,
     assert_user_updated,
 )
 from clients.auth_client import AuthClient
 from models.auth_entities import LoginPayload, RegisteredUser, RegisterPayload, UpdateUserPayload
-from models.auth_models import GetUserResponse, LoginResponse
+from models.auth_models import ErrorResponse, GetUserResponse, LoginResponse, LogoutResponse
 
 
 class AuthWorkflow:
@@ -62,3 +64,57 @@ class AuthWorkflow:
         updated = assert_get_user(got_resp)
 
         return registered_user, updated
+
+    def register_logout_get_user(
+        self, register_payload: RegisterPayload
+    ) -> tuple[RegisteredUser, LogoutResponse, GetUserResponse]:
+        register_resp = self.auth_client.register(register_payload)
+
+        registered_data = assert_user_registered(register_resp)
+
+        registered_user = RegisteredUser(
+            access_token=registered_data.access_token,
+            refresh_token=registered_data.refresh_token,
+            email=register_payload.email,
+            name=register_payload.name,
+            password=register_payload.password,
+        )
+
+        logout_resp = self.auth_client.logout(
+            registered_user.refresh_token, registered_user.access_token
+        )
+
+        user_logged_out = assert_user_logged_out(logout_resp)
+
+        got_user_resp = self.auth_client.get_user(registered_user.access_token)
+
+        got_user = assert_get_user(got_user_resp)
+
+        return registered_user, user_logged_out, got_user
+
+    def register_logout_refresh_unauthorized(
+        self, register_payload: RegisterPayload
+    ) -> tuple[RegisteredUser, LogoutResponse, ErrorResponse]:
+        register_resp = self.auth_client.register(register_payload)
+
+        registered_data = assert_user_registered(register_resp)
+
+        registered_user = RegisteredUser(
+            access_token=registered_data.access_token,
+            refresh_token=registered_data.refresh_token,
+            email=register_payload.email,
+            name=register_payload.name,
+            password=register_payload.password,
+        )
+
+        logout_resp = self.auth_client.logout(
+            registered_user.refresh_token, registered_user.access_token
+        )
+
+        user_logged_out = assert_user_logged_out(logout_resp)
+
+        refresh_resp = self.auth_client.refresh_token(registered_user.refresh_token)
+
+        unauthorized = assert_error_data(refresh_resp, 401)
+
+        return registered_user, user_logged_out, unauthorized

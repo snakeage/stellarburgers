@@ -33,3 +33,8 @@ class UpdateUserResponse(ApiModel):
 class GetUserResponse(ApiModel):
     success: bool
     user: UserModel
+
+
+class LogoutResponse(ApiModel):
+    success: bool
+    message: str

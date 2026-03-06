@@ -154,3 +154,24 @@ def test_register_update_get_workflow(auth_workflow, user_credentials):
     assert updated.user.name == updated_user_payload.name
     assert updated.user.email == registered_user.email
     assert updated.user.name != registered_user.name
+
+
+def test_register_logout_get_user_workflow(auth_workflow, user_credentials):
+    _, user_logged_out, got_user = auth_workflow.register_logout_get_user(
+        user_credentials,
+    )
+
+    assert user_logged_out.success is True
+    assert got_user.success is True
+    assert got_user.user.name == user_credentials.name
+    assert got_user.user.email == user_credentials.email
+
+
+def test_register_logout_refresh_unauthorized_workflow(auth_workflow, user_credentials):
+    _, user_logged_out, unauthorized = auth_workflow.register_logout_refresh_unauthorized(
+        user_credentials,
+    )
+
+    assert user_logged_out.success is True
+    assert unauthorized.success is False
+    assert unauthorized.message == "Token is invalid"

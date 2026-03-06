@@ -2,6 +2,7 @@ from models.auth_models import (
     ErrorResponse,
     GetUserResponse,
     LoginResponse,
+    LogoutResponse,
     RegisterResponse,
     UpdateUserResponse,
 )
@@ -53,15 +54,10 @@ def assert_user_logged_in(resp, expected_user=None):
 def assert_user_logged_out(resp):
     assert resp.status_code == 200, resp.text
 
-    body = resp.json()
+    parsed = LogoutResponse.model_validate(resp.json())
 
-    assert body, "Отсутствует тело ответа"
-    assert isinstance(body, dict), "Тело ответа должно быть dict"
-
-    for field in ("success", "message"):
-        assert field in body, f"Отсутствует поле {field} в ответе"
-
-    assert body["success"] is True
+    assert parsed.success is True
+    return parsed
 
 
 def assert_user_updated(resp, expected_user=None):
