@@ -14,6 +14,8 @@ from models.auth_entities import LoginPayload, UpdateUserPayload
 
 
 class TestAuthApi:
+    @pytest.mark.smoke
+    @pytest.mark.regression
     def test_register_user(self, auth_client, user_credentials):
         resp = auth_client.register(user_credentials)
 
@@ -33,6 +35,8 @@ class TestAuthApi:
 
         assert resp_got_after_delete.status_code == 404, "Пользователь не удален"
 
+    @pytest.mark.smoke
+    @pytest.mark.regression
     def test_get_user(self, auth_client, registered_user):
         access_token = registered_user.access_token
 
@@ -40,6 +44,8 @@ class TestAuthApi:
 
         assert_get_user(resp)
 
+    @pytest.mark.smoke
+    @pytest.mark.regression
     def test_login_user(self, auth_client, registered_user):
         payload = LoginPayload(
             email=registered_user.email,
@@ -50,6 +56,7 @@ class TestAuthApi:
 
         assert_user_logged_in(resp, expected_user=registered_user)
 
+    @pytest.mark.workflow
     def test_register_and_login_workflow(self, auth_workflow, user_credentials):
         registered, logged_in = auth_workflow.register_and_login(user_credentials)
 
@@ -57,6 +64,8 @@ class TestAuthApi:
         assert logged_in.user.email == registered.email
         assert logged_in.user.name == registered.name
 
+    @pytest.mark.smoke
+    @pytest.mark.regression
     def test_logout_user(self, auth_client, registered_user):
         access_token = registered_user.access_token
         refresh_token = registered_user.refresh_token
@@ -65,6 +74,7 @@ class TestAuthApi:
 
         assert_user_logged_out(resp)
 
+    @pytest.mark.regression
     def test_update_user(self, auth_client, registered_user):
         access_token = registered_user.access_token
         payload = UpdateUserPayload(
@@ -74,6 +84,7 @@ class TestAuthApi:
 
         assert_user_updated(resp, expected_user=payload)
 
+    @pytest.mark.regression
     def test_delete_user(self, auth_client, registered_user):
         access_token = registered_user.access_token
 
@@ -81,6 +92,7 @@ class TestAuthApi:
 
         assert_user_deleted(resp)
 
+    @pytest.mark.regression
     def test_refresh_token(self, auth_client, registered_user):
         refresh_token = registered_user.refresh_token
 
@@ -89,6 +101,7 @@ class TestAuthApi:
         assert_token_refreshed(resp)
 
     @pytest.mark.negative
+    @pytest.mark.regression
     @pytest.mark.parametrize(
         "email,password,expected_status",
         [
@@ -105,6 +118,7 @@ class TestAuthApi:
 
 
 @pytest.mark.negative
+@pytest.mark.regression
 @pytest.mark.parametrize(
     "method_name,access_token,payload,expected_status,expected_message",
     [
@@ -130,6 +144,7 @@ def test_protected_methods_without_token(
 
 
 @pytest.mark.negative
+@pytest.mark.regression
 @pytest.mark.parametrize(
     "refresh_token,expected_status",
     [
@@ -144,6 +159,7 @@ def test_refresh_token_invalid_values(auth_client, refresh_token, expected_statu
     assert_error_data(resp, expected_status)
 
 
+@pytest.mark.workflow
 def test_register_update_get_workflow(auth_workflow, user_credentials):
     updated_user_payload = UpdateUserPayload(name="patched_" + user_credentials.name)
     registered_user, updated = auth_workflow.register_update_get(
@@ -156,6 +172,7 @@ def test_register_update_get_workflow(auth_workflow, user_credentials):
     assert updated.user.name != registered_user.name
 
 
+@pytest.mark.workflow
 def test_register_logout_get_user_workflow(auth_workflow, user_credentials):
     _, user_logged_out, got_user = auth_workflow.register_logout_get_user(
         user_credentials,
@@ -167,6 +184,9 @@ def test_register_logout_get_user_workflow(auth_workflow, user_credentials):
     assert got_user.user.email == user_credentials.email
 
 
+@pytest.mark.workflow
+@pytest.mark.negative
+@pytest.mark.regression
 def test_register_logout_refresh_unauthorized_workflow(auth_workflow, user_credentials):
     _, user_logged_out, unauthorized = auth_workflow.register_logout_refresh_unauthorized(
         user_credentials,
