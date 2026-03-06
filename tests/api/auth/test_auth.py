@@ -50,6 +50,13 @@ class TestAuthApi:
 
         assert_user_logged_in(resp, expected_user=registered_user)
 
+    def test_register_and_login_workflow(self, auth_workflow, user_credentials):
+        registered, logged_in = auth_workflow.register_and_login(user_credentials)
+
+        assert logged_in.success is True
+        assert logged_in.user.email == registered.email
+        assert logged_in.user.name == registered.name
+
     def test_logout_user(self, auth_client, registered_user):
         access_token = registered_user.access_token
         refresh_token = registered_user.refresh_token
