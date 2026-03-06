@@ -38,3 +38,9 @@ class GetUserResponse(ApiModel):
 class LogoutResponse(ApiModel):
     success: bool
     message: str
+
+
+class RefreshResponse(ApiModel):
+    success: bool
+    access_token: str
+    refresh_token: str

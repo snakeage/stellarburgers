@@ -3,6 +3,7 @@ from models.auth_models import (
     GetUserResponse,
     LoginResponse,
     LogoutResponse,
+    RefreshResponse,
     RegisterResponse,
     UpdateUserResponse,
 )
@@ -78,16 +79,10 @@ def assert_user_updated(resp, expected_user=None):
 def assert_token_refreshed(resp):
     assert resp.status_code == 200, resp.text
 
-    body = resp.json()
+    parsed = RefreshResponse.model_validate(resp.json())
 
-    assert body, "Отсутствует тело ответа"
-    assert isinstance(body, dict), "Тело ответа должно быть dict"
-
-    for field in ("success", "accessToken", "refreshToken"):
-        assert field in body, f"Отсутствует поле {field} в ответе"
-
-    assert body["accessToken"].startswith("Bearer ")
-    assert isinstance(body["refreshToken"], str)
+    assert parsed.success is True
+    assert parsed.access_token.startswith("Bearer ")
 
 
 def assert_error_data(resp, status_code: int):
