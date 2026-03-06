@@ -29,3 +29,6 @@ htmlcov/
 build/
 dist/
 *.egg-info/
+
+#Allure
+allure-results/
