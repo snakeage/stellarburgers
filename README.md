@@ -69,9 +69,28 @@ GitHub Actions workflow (`.github/workflows/ci.yml`) runs:
 - dependency installation
 - `pre-commit run --all-files`
 - smoke tests (`pytest -m smoke -q --maxfail=1`)
+- uploads `allure-results` as a workflow artifact
 
 Repository variable required for CI:
 - `BASE_URL`
+
+## Allure Artifacts (From CI)
+To inspect Allure results from a CI run:
+1. Open `Actions` in GitHub and select a workflow run.
+2. Download artifact `allure-results`.
+3. Unzip it locally.
+4. Build/open report:
+
+```bash
+allure serve path/to/allure-results
+```
+
+Alternative:
+
+```bash
+allure generate path/to/allure-results -o allure-report --clean
+allure open allure-report
+```
 
 ## Current Coverage
 Implemented:
